@@ -3,11 +3,14 @@ var xml_digester = require("../lib/xml-digester");
 digester = xml_digester.XmlDigester({});
 
 var _logger = xml_digester._logger;
-// _logger.level(_logger.DEBUG_LEVEL);
+_logger.level(_logger.TRACE_LEVEL);
 
 
 function test_parse(test, xml, expected) {
-  test.deepEqual(digester.digest(xml), expected, "xml: " + xml);
+  digester.digest(xml, function(err, result) {
+    test.ifError(err);
+    test.deepEqual(result, expected, "xml: " + xml);
+  })
 }
 
 exports.testSimple = function(test) {
@@ -48,8 +51,17 @@ exports.testSimple = function(test) {
   test.done();
 }
 
-exports.testInvalidXml = function(test) {
-  digester.digest("<missing-closing")
-  test.done();
+function test_error(test, xml) {
+  digester.digest(xml, function (err, result) {
+    test.ok(err == undefined, "error expected: Xml is not correct: \"" + xml + "\"");
+  })
 }
+
+// exports.testInvalidXml = function(test) {
+//   test_error(test, "<missing-closing");
+//   test_error(test, "<missing-closing><foo/></missing-closin>");
+//   test_error(test, "missing-closing");
+//   test_error(test, "");
+//   test.done();
+// }
 
