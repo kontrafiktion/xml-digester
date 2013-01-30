@@ -1,4 +1,5 @@
 var xml_digester = require("../lib/xml-digester");
+var util = require("util");
 
 digester = xml_digester.XmlDigester({});
 
@@ -65,23 +66,118 @@ function test_error(test, xml) {
 //   test.done();
 // }
 
-exports.testHandler = function(test) {
+// exports.testSkipHandler = function(test) {
 
+//   var options = {
+//     "handler": [
+//       { "path": "foo", "handler": xml_digester.SkipElementsHandler}
+//     ],
+//     "sax_opts": {}
+//   };
+
+//   var digester = new xml_digester.XmlDigester(options);
+
+//   digester.digest("<root><foo></foo><bar><foo/></bar></root>", function(err, result) {
+//     test.ifError(err);
+//     test.deepEqual(result, { root: { bar: {} } }, "xml: " + "<root><foo>/foo><bar><foo/></bar></root>");
+//     console.log(result);
+//   });
+
+//   test.done();
+// }
+
+function test_handler(test, xml, path, handler, expected) {
   var options = {
     "handler": [
-      { "path": "foo", "handler": xml_digester.SkipElementsHandler}
+      { "path": path, "handler": handler}
     ],
     "sax_opts": {}
   };
-
   var digester = new xml_digester.XmlDigester(options);
-
-  digester.digest("<root><foo></foo><bar><foo/></bar></root>", function(err, result) {
+  digester.digest(xml, function(err, result) {
     test.ifError(err);
-    test.deepEqual(result, { root: { bar: {} } }, "xml: " + "<root><foo>/foo><bar><foo/></bar></root>");
-    console.log(result);
+    test.deepEqual(result, expected, "xml: " + xml);
+    console.log(util.inspect(result, true, 3));
   });
+
+}
+
+// exports.testSimpleOrderedElementsHandler = function(test) {
+
+//   var xml = "<root><books>" 
+//     + "<book><author>Philipp Pullmann</author><title>The Golden Compass</title></book>"
+//     + "<book><author>Jonathan Carroll</author><title>Land of Laughs</title></book>"
+//     + "</books></root>";
+
+//   test_handler(test, 
+//                 xml, 
+//                 "books/book", 
+//                 xml_digester.OrderedElementsHandler, 
+//                 { root: 
+//                   { books: 
+//                     [ { author: 'Philipp Pullmann', title: 'The Golden Compass' },
+//                       { author: 'Jonathan Carroll', title: 'Land of Laughs' } ] } });
+
+//   test_handler(test, 
+//                 xml, 
+//                 "books/*", 
+//                 xml_digester.OrderedElementsHandler, 
+//                 { root: 
+//                   { books: 
+//                     [ { author: 'Philipp Pullmann', title: 'The Golden Compass' },
+//                       { author: 'Jonathan Carroll', title: 'Land of Laughs' } ] } });
+
+//   test_handler(test, 
+//                 xml, 
+//                 "book", 
+//                 xml_digester.OrderedElementsHandler, 
+//                 { root: 
+//                   { books: 
+//                     [ { author: 'Philipp Pullmann', title: 'The Golden Compass' },
+//                       { author: 'Jonathan Carroll', title: 'Land of Laughs' } ] } });
+//   test.done();
+// }
+
+// TODO: child nodes that should convert to Strings
+
+exports.testDifferingOrderedElements = function(test) {
+
+  var xml = "<root><path>" 
+    + "<Betriebsstellengrenzknoten id=\"1452\"/>"
+    + "<Weiche id=\"1557\"></Weiche>"
+    + "</path></root>";
+
+  test_handler(test, 
+                xml, 
+                "path/*", 
+                new xml_digester.OrderedElementsHandler(), 
+                 { root: 
+                   { path: 
+                      [ { id: '1452', _name: 'Betriebsstellengrenzknoten' },
+                        { id: '1557', _name: 'Weiche' } ] } });
+
+  test_handler(test, 
+                xml, 
+                "path/*", 
+                new xml_digester.OrderedElementsHandler("blah"), 
+                 { root: 
+                   { path: 
+                      [ { id: '1452', 'blah': 'Betriebsstellengrenzknoten' },
+                        { id: '1557', 'blah': 'Weiche' } ] } });
+
+  var xml = "<root><path>" 
+    + "<Betriebsstellengrenzknoten></Betriebsstellengrenzknoten>"
+    + "<Weiche>content</Weiche>"
+    + "</path></root>";
+
+  test_handler(test, 
+                xml, 
+                "path/*", 
+                new xml_digester.OrderedElementsHandler("name"), 
+                 { root: 
+                   { path: 
+                      [ { id: '1452', 'blah': 'Betriebsstellengrenzknoten' },
+                        { id: '1557', 'blah': 'Weiche' } ] } });
 
   test.done();
 }
-
