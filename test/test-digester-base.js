@@ -4,7 +4,7 @@ var util = require("util");
 digester = xml_digester.XmlDigester({});
 
 var _logger = xml_digester._logger;
-_logger.level(_logger.TRACE_LEVEL);
+// _logger.level(_logger.TRACE_LEVEL);
 
 
 function test_parse(test, xml, expected) {
@@ -16,37 +16,41 @@ function test_parse(test, xml, expected) {
 
 exports.testSimple = function(test) {
 
-//   test_parse(test, 
-//     "<root></root>", 
-//     { root: { } });
+  test_parse(test, 
+    "<root></root>", 
+    { root: { } });
 
-  // test_parse(test, 
-  //   "<root/>", 
-  //   { root: { } });
+  test_parse(test, 
+    "<root/>", 
+    { root: { } });
 
-//   test_parse(test, 
-//     "<root>content</root>", 
-//     { root: 'content' });
+  test_parse(test, 
+    "<root id=\"13\"></root>", 
+    { root: { id: 13 } });
 
-//   test_parse(test, 
-//     "<root><foo>content</foo></root>", 
-//     { root: { foo: 'content' } });
+  test_parse(test, 
+    "<root>content</root>", 
+    { root: 'content' });
 
-//   test_parse(test,
-//     "<root><foo attr=\"attrvalue\">content</foo></root>", 
-//     { root: { foo: { attr: 'attrvalue', _text: 'content' } } });
+  test_parse(test, 
+    "<root><foo>content</foo></root>", 
+    { root: { foo: 'content' } });
 
-//   test_parse(test,
-//     "<root><foo>foo1</foo><foo>foo2</foo></root>", 
-//     { root: { foo: [ 'foo1', 'foo2' ] } } );
+  test_parse(test,
+    "<root><foo attr=\"attrvalue\">content</foo></root>", 
+    { root: { foo: { attr: 'attrvalue', _text: 'content' } } });
 
-//   test_parse(test,
-//     "<root><foo>foo1</foo><foo attr=\"attrvalue\">foo2</foo></root>", 
-//     { root: { foo: [ 'foo1', { attr: 'attrvalue', _text: 'foo2' } ] } } );
+  test_parse(test,
+    "<root><foo>foo1</foo><foo>foo2</foo></root>", 
+    { root: { foo: [ 'foo1', 'foo2' ] } } );
 
-//   test_parse(test,
-//     "<root foo=\"fooattr\"><foo>content</foo></root>", 
-//     { root: { foo: [ 'fooattr', 'content' ] } } );
+  test_parse(test,
+    "<root><foo>foo1</foo><foo attr=\"attrvalue\">foo2</foo></root>", 
+    { root: { foo: [ 'foo1', { attr: 'attrvalue', _text: 'foo2' } ] } } );
+
+  test_parse(test,
+    "<root foo=\"fooattr\"><foo>content</foo></root>", 
+    { root: { foo: [ 'fooattr', 'content' ] } } );
 
 
    test.done();
@@ -66,25 +70,25 @@ function test_error(test, xml) {
 //   test.done();
 // }
 
-// exports.testSkipHandler = function(test) {
+exports.testSkipHandler = function(test) {
 
-//   var options = {
-//     "handler": [
-//       { "path": "foo", "handler": xml_digester.SkipElementsHandler}
-//     ],
-//     "sax_opts": {}
-//   };
+  var options = {
+    "handler": [
+      { "path": "foo", "handler": new xml_digester.SkipElementsHandler()}
+    ],
+    "sax_opts": {}
+  };
 
-//   var digester = new xml_digester.XmlDigester(options);
+  var digester = new xml_digester.XmlDigester(options);
 
-//   digester.digest("<root><foo></foo><bar><foo/></bar></root>", function(err, result) {
-//     test.ifError(err);
-//     test.deepEqual(result, { root: { bar: {} } }, "xml: " + "<root><foo>/foo><bar><foo/></bar></root>");
-//     console.log(result);
-//   });
+  digester.digest("<root><foo></foo><bar><foo/></bar></root>", function(err, result) {
+    test.ifError(err);
+    test.deepEqual(result, { root: { bar: {} } }, "xml: " + "<root><foo>/foo><bar><foo/></bar></root>");
+    console.log(result);
+  });
 
-//   test.done();
-// }
+  test.done();
+}
 
 function test_handler(test, xml, path, handler, expected) {
   var options = {
@@ -97,48 +101,46 @@ function test_handler(test, xml, path, handler, expected) {
   digester.digest(xml, function(err, result) {
     test.ifError(err);
     test.deepEqual(result, expected, "xml: " + xml);
-    console.log(util.inspect(result, true, 3));
+    // console.log(util.inspect(result, true, 3));
   });
 
 }
 
-// exports.testSimpleOrderedElementsHandler = function(test) {
+exports.testSimpleOrderedElementsHandler = function(test) {
 
-//   var xml = "<root><books>" 
-//     + "<book><author>Philipp Pullmann</author><title>The Golden Compass</title></book>"
-//     + "<book><author>Jonathan Carroll</author><title>Land of Laughs</title></book>"
-//     + "</books></root>";
+  var xml = "<root><books>" 
+    + "<book><author>Philipp Pullmann</author><title>The Golden Compass</title></book>"
+    + "<book><author>Jonathan Carroll</author><title>Land of Laughs</title></book>"
+    + "</books></root>";
 
-//   test_handler(test, 
-//                 xml, 
-//                 "books/book", 
-//                 xml_digester.OrderedElementsHandler, 
-//                 { root: 
-//                   { books: 
-//                     [ { author: 'Philipp Pullmann', title: 'The Golden Compass' },
-//                       { author: 'Jonathan Carroll', title: 'Land of Laughs' } ] } });
+  test_handler(test, 
+                xml, 
+                "books/book", 
+                new xml_digester.OrderedElementsHandler(), 
+                { root: 
+                  { books: 
+                    [ { author: 'Philipp Pullmann', title: 'The Golden Compass' },
+                      { author: 'Jonathan Carroll', title: 'Land of Laughs' } ] } });
 
-//   test_handler(test, 
-//                 xml, 
-//                 "books/*", 
-//                 xml_digester.OrderedElementsHandler, 
-//                 { root: 
-//                   { books: 
-//                     [ { author: 'Philipp Pullmann', title: 'The Golden Compass' },
-//                       { author: 'Jonathan Carroll', title: 'Land of Laughs' } ] } });
+  test_handler(test, 
+                xml, 
+                "books/*", 
+                new xml_digester.OrderedElementsHandler(), 
+                { root: 
+                  { books: 
+                    [ { author: 'Philipp Pullmann', title: 'The Golden Compass' },
+                      { author: 'Jonathan Carroll', title: 'Land of Laughs' } ] } });
 
-//   test_handler(test, 
-//                 xml, 
-//                 "book", 
-//                 xml_digester.OrderedElementsHandler, 
-//                 { root: 
-//                   { books: 
-//                     [ { author: 'Philipp Pullmann', title: 'The Golden Compass' },
-//                       { author: 'Jonathan Carroll', title: 'Land of Laughs' } ] } });
-//   test.done();
-// }
-
-// TODO: child nodes that should convert to Strings
+  test_handler(test, 
+                xml, 
+                "book", 
+                new xml_digester.OrderedElementsHandler(), 
+                { root: 
+                  { books: 
+                    [ { author: 'Philipp Pullmann', title: 'The Golden Compass' },
+                      { author: 'Jonathan Carroll', title: 'Land of Laughs' } ] } });
+  test.done();
+}
 
 exports.testDifferingOrderedElements = function(test) {
 
@@ -150,20 +152,12 @@ exports.testDifferingOrderedElements = function(test) {
   test_handler(test, 
                 xml, 
                 "path/*", 
-                new xml_digester.OrderedElementsHandler(), 
+                new xml_digester.OrderedElementsHandler("name"), 
                  { root: 
                    { path: 
-                      [ { id: '1452', _name: 'Betriebsstellengrenzknoten' },
-                        { id: '1557', _name: 'Weiche' } ] } });
+                      [ { id: '1452', name: 'Betriebsstellengrenzknoten' },
+                        { id: '1557', name: 'Weiche' } ] } });
 
-  test_handler(test, 
-                xml, 
-                "path/*", 
-                new xml_digester.OrderedElementsHandler("blah"), 
-                 { root: 
-                   { path: 
-                      [ { id: '1452', 'blah': 'Betriebsstellengrenzknoten' },
-                        { id: '1557', 'blah': 'Weiche' } ] } });
 
   var xml = "<root><path>" 
     + "<Betriebsstellengrenzknoten></Betriebsstellengrenzknoten>"
@@ -176,8 +170,23 @@ exports.testDifferingOrderedElements = function(test) {
                 new xml_digester.OrderedElementsHandler("name"), 
                  { root: 
                    { path: 
-                      [ { id: '1452', 'blah': 'Betriebsstellengrenzknoten' },
-                        { id: '1557', 'blah': 'Weiche' } ] } });
+                      [ { name: 'Betriebsstellengrenzknoten' },
+                        { name: 'Weiche', _text: 'content' } ] } });
 
+
+
+  var xml = "<root><path order-number=\"1\">" 
+    + "<Betriebsstellengrenzknoten></Betriebsstellengrenzknoten>"
+    + "<Weiche>content</Weiche>"
+    + "</path></root>";
+
+  test_handler(test, 
+                xml, 
+                "path/*", 
+                new xml_digester.OrderedElementsHandler("name"), 
+                 { root: 
+                   { path: 
+                      [ { name: 'Betriebsstellengrenzknoten' },
+                        { name: 'Weiche', _text: 'content' } ] } });
   test.done();
 }
