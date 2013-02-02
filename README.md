@@ -1,12 +1,9 @@
 # XML Digester
 
-Maps Xml to JavaScript objects while allowing you to influence the conversion.
-Thereby some unusual Xml documents can be mapped with ease.
+Maps Xml to JavaScript objects while allowing you to influence the conversion. Thereby some unusual Xml documents can be mapped with ease.
 
 ## Disclaimer
-This is my first node module and I have never _really_ programmed in JavaScript before.
-So be warned. If you do not need the features of this converter, you should probably 
-use one of the [alternatives](#alternatives)
+This is my first node module and I have never _really_ programmed in JavaScript before. So be warned. If you do not need the features of this converter, you should probably use one of the [alternatives](#alternatives)
 
 ## Why yet another Xml-to-JavaScript mapper? 
 
@@ -25,9 +22,7 @@ I needed to preserve the order of the 'nodes' ("crossing", "street", etc.):
     { nodes: [ {name:"crossing"}, {name:"street"}, ... ] }
 
 
-But none of the converters I tried (see below [alternatives](#alternatives)), allowed me
-to do that. Some like [xml-stream][xmlstream] allow
-to collect nodes of the same name into an array:
+But none of the converters I tried (see below [alternatives](#alternatives)), allowed me to do that. Some like [xml-stream][xmlstream] allow to collect nodes of the same name into an array:
 
     <nodes>
        <node kind="crossing"/>
@@ -39,37 +34,35 @@ to collect nodes of the same name into an array:
 
 but I didn't want to create a stylesheet that first transformed these documents. 
 
-There are other mappers like [xmldom][xmldom] that create a whole Dom tree, but I wanted something 
-simpler and something that could easily be extended by someone else.
+There are other mappers like [xmldom][xmldom] that create a whole Dom tree, but I wanted something simpler and something that could easily be extended by someone else.
 
 ## Basic usage
 
-    var xml_digester = require("xml-digester");
-    var digester = xml_digester.XmlDigester({});
+```javascript
+var xml_digester = require("xml-digester");
+var digester = xml_digester.XmlDigester({});
 
-    var xml = "<root>"
-      + "<foo>foo1</foo>"
-      + "<bar>bar1></bar>"
-      + "<foo>foo2</foo>"
-      + "</root>"
+var xml = "<root>"
+  + "<foo>foo1</foo>"
+  + "<bar>bar1></bar>"
+  + "<foo>foo2</foo>"
+  + "</root>"
 
-    digester.digest(xml, function(err, result) {
-      if (err) { 
-        console.log(err);
-      } else {
-        console.log(result);
-        // result will be { root: { foo: [ 'foo1', 'foo2' ], bar: 'bar1>' } }
-      }
-    })
+digester.digest(xml, function(err, result) {
+  if (err) { 
+    console.log(err);
+  } else {
+    console.log(result);
+    // result will be { root: { foo: [ 'foo1', 'foo2' ], bar: 'bar1>' } }
+  }
+})
+```
 
-This is the normal mapping behaviour, which all other converters offer. So 
-it should be possible to simply replace your existing mapper with xml-digester.
+This is the normal mapping behaviour, which all other converters offer. So it should be possible to simply replace your existing mapper with xml-digester.
 
 ## Advanced usage
 
-If you need to influence the mapping you can declare that certain Xml elements 
-should be converted by a special handler. The declaration supports a very minimal 
-subset of XPath:
+If you need to influence the mapping you can declare that certain Xml elements should be converted by a special handler. The declaration supports a very minimal subset of XPath:
 
 - **`foo`** matches all 'foo' elements
 - **`bar/foo`** matches all 'foo' elements which have a 'bar' element as parent
@@ -80,55 +73,148 @@ subset of XPath:
 
 There are three predefined handlers. 
 
-1. The SkipElementsHandler (`xml_digester.SkipElementsHandler`)
-   that just removes elements (and their child elements)
-2. The OrderElementsHandler (`xml_digester.OrderedElementsHandler`) 
-   that is used to preserve the order of elements 
-   (see [Why ...](#whyyetanotherxml-to-javascriptmapper))
-3. And the DefaultHandler (`xml_digester.DefaultHandler`), 
-   which is used normally but which can be used 
-   by another handler as well
+1. The SkipElementsHandler (`xml_digester.SkipElementsHandler`) that just removes elements (and their child elements)
+2. The OrderElementsHandler (`xml_digester.OrderedElementsHandler`) that is used to preserve the order of elements (see [Why ...](#whyyetanotherxml-to-javascriptmapper)) 
+3. And the DefaultHandler (`xml_digester.DefaultHandler`), which is used normally but which can be used by another handler as well
 
 To use the handler you have to set it as an option to the digester:
 
-    var xml_digester = require("../lib/xml-digester");
+```javascript
+var xml_digester = require("../lib/xml-digester");
 
-    var handler = new xml_digester.OrderedElementsHandler("kind");
-    var options = {
-      "handler": [
-        { "path": "nodes/*", "handler": handler}
-      ]};
-    var digester = xml_digester.XmlDigester(options);
-    var xml = "<nodes>"
-            +   "<crossing/><street/><cross-walk/><street/><end-of-town/>"
-            + "</nodes>"
+var handler = new xml_digester.OrderedElementsHandler("kind");
+var options = {
+  "handler": [
+    { "path": "nodes/*", "handler": handler}
+  ]};
+var digester = xml_digester.XmlDigester(options);
+var xml = "<nodes>"
+        +   "<crossing/><street/><cross-walk/><street/><end-of-town/>"
+        + "</nodes>"
 
-    digester.digest(xml, function(err, result) {
-      if (err) { 
-      } else {
-        console.log(result);
-        // result will 
-        // { nodes:  [ { kind: 'crossing' }, { kind: 'street' }, ... ] }
-      }
-    })
+digester.digest(xml, function(err, result) {
+  if (err) { 
+  } else {
+    console.log(result);
+    // result will 
+    // { nodes:  [ { kind: 'crossing' }, { kind: 'street' }, ... ] }
+  }
+})
+```
 
-Since the name of the nodes should preserved, you can define a property-name
-(in the above example it is 'kind'). The Xml Element name will then be stored 
-in the JavaScript object in that property.
+Since the name of the nodes should preserved, you can define a property-name (in the above example it is 'kind'). The Xml Element name will then be stored in the JavaScript object in that property.
 
-If you do not give a property-name, the '_name' property will be used. But this 
-property is not 'enumerable', i.e. Object.keys(node) will not list the '_name' 
-property.
+If you do not give a property-name, the '_name' property will be used. But this property is not 'enumerable', i.e. Object.keys(node) will not list the '_name' property.
 
-If there are multiple paths that match a given Xml element, 
-the handler of the first matching path in the 'handler' array will be used.
+If there are multiple paths that match a given Xml element, the handler of the first matching path in the 'handler' array will be used.
 
 ## Create your own handler
 
-You can create your own handler, if you understand some of the inner workings 
-of the XmlDigester. For now I would advise you not to do that, because the API
-might change. But the doucmentation will come as soon as possible, once I feel
-the API has stabilized enough.
+You can create your own handler, if you understand some of the inner workings of the XmlDigester. For now I would advise you not to do that, because the API might change. But the doucmentation will come as soon as possible, once I feel the API has stabilized enough.
+
+### Logging/Debugging
+
+This module contains a very simple debugging mechanism that allows you to inspect the inner workings.
+
+    var _logger = xml_digester._logger;
+    _logger.level(_logger.TRACE_LEVEL);
+
+The following logging level are supported 
+
+> **\_logger.ERROR\_LEVEL**  
+> **\_logger.WARN\_LEVEL**  
+> **\_logger.INFO\_LEVEL**  
+> **\_logger.DEBUG\_LEVEL**  
+> **\_logger.TRACE\_LEVEL**
+
+If you look at logging in `examples/basic-example.js` you should see something like
+
+![][trace]
+
+[trace]: https://raw.github.com/vrvolle/xml-digester/master/doc/trace.png 
+
+You can see
+
+  - all the opening tags (with their parent tags), e.g `<root><foo>`
+  - each current element as returned by sax-js: `{ name: 'root', attributes: {}, isSelfClosing: false }`
+  - all the closing tags (with their parent tags), e.g `<root><`**/**`foo>`
+  - and the current object stack:
+
+        DEBUG:  -> document
+        DEBUG:  ->   root
+
+    the object stack always contains a top level element 'document' and will normally directly correspond to the Xml element hierarchy, but if you manipulate the object stack (as the OrderedElementsHandler does)
+
+This logging should really help you, when you try to develop your own handler.
+
+### The handler API
+
+Each handler must (currently) implement the following functions:
+
+#### `onopentag(node, digester)`
+
+The DefaultHandler 
+
+1. pushes the current object on the object stack (`digester.object_stack`)
+2. creates a new object based on the attributes of the element and ...
+3. ... makes that object the current object (`digester.current_object`)
+
+#### `onclosetag(node_name, digester)`
+
+The DefaultHandler
+
+1. gets the parent object from the object stack (`digester.object_stack`)
+1. If the current node had no children and no attributes but some text content, then the text will be used as current node
+1. assigns the current object to a property (using the "node_name" as property name)
+        
+    - if there already is a property with that name, an array will be created that contains the previous and the new object (every following object with the same will simply be added to the array)
+
+1. reinstates the parent object as the current object
+
+The easiest way to write a new handler is to reuse the DefaultHandler and to use it as delegate: 
+
+```javascript
+function MyHandler() {
+  this.defaultHandler = new xml_digester.DefaultHandler();
+}
+
+MyHandler.prototype.onopentag = function(node, digester) {
+  this.defaultHandler.onopentag(node, digester);
+}
+
+MyHandler.prototype.onclosetag = function(node_name, digester) {
+  var parent_object = digester.object_stack.pop();
+
+  // uses the text content as a the current object
+  // if the current object has no properties
+  this.defaultHandler.textifyCurrentObject(digester);
+
+  parent_object[digester.current_object.name] = digester.current_object.content;
+
+  digester.current_object = parent_object;
+}
+```
+
+In the above example only the `onclosetag` function is adapted. The XML may look 
+like:
+
+    <root>
+      <bar name="bar1"><content>some_text</content></bar>
+      <bar name="bar2"><content>some_other_text</content></bar>
+    </root>
+
+Normally the object would be: 
+
+    { root: 
+       { bar: 
+          [ { name: 'bar1', content: 'some_text' },
+            { name: 'bar2', content: 'some_other_text' } ] } }
+
+The above handler gets rid of the "bar" property and directly assign the 'bar'  _elements_ to the root object using their "name" as property-name in the root object and the "content" as value.
+
+    { root: { bar1: 'some_text', bar2: 'some_other_text' } }
+
+
 
 ## TODOs
 
