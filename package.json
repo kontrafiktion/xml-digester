@@ -1,6 +1,6 @@
 {
   "name": "xml-digester",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "convert XML to JSON",
   "tags": [
     "xml",
@@ -15,10 +15,14 @@
   "scripts": {
     "test": "nodeunit test/"
   },
+    "repository": {
+    "type": "git",
+    "url": "http://github.com/vrvolle/xml-digester"
+  },
   "license": {
     "type": "MIT"
   },
   "readmeFilename": "README.md",
   "_id": "xml-digester@0.0.1",
-  "_from": "xml-digetser@>= 0.0.1"
+  "_from": "xml-digester@>= 0.0.1"
 }

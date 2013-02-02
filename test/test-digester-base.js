@@ -99,12 +99,18 @@ function test_handler(test, xml, path, handler, expected) {
   };
   var digester = new xml_digester.XmlDigester(options);
   digester.digest(xml, function(err, result) {
-    test.ifError(err);
-    test.deepEqual(result, expected, "xml: " + xml);
+    if ( ! expected ) {
+      console.log("HERE");
+      test.ok(err, "error expected");
+    } else {
+      test.ifError(err);
+      test.deepEqual(result, expected, "xml: " + xml);
+    }
     // console.log(util.inspect(result, true, 3));
   });
 
 }
+
 
 exports.testSimpleOrderedElementsHandler = function(test) {
 
@@ -184,9 +190,6 @@ exports.testDifferingOrderedElements = function(test) {
                 xml, 
                 "path/*", 
                 new xml_digester.OrderedElementsHandler("name"), 
-                 { root: 
-                   { path: 
-                      [ { name: 'Betriebsstellengrenzknoten' },
-                        { name: 'Weiche', _text: 'content' } ] } });
+                undefined);
   test.done();
 }

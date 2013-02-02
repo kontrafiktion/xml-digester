@@ -130,6 +130,14 @@ of the XmlDigester. For now I would advise you not to do that, because the API
 might change. But the doucmentation will come as soon as possible, once I feel
 the API has stabilized enough.
 
+## TODOs
+
+1. Handling of CDATA
+2. Some handling of Namespaces
+3. Forwarding of any sax-js options
+4. Using Buffers as well as Strings
+5. Using Streams
+
 ## Alternatives
 
 [xml2json](https://github.com/buglabs/node-xml2json)  
