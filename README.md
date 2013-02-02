@@ -96,8 +96,7 @@ digester.digest(xml, function(err, result) {
   if (err) { 
   } else {
     console.log(result);
-    // result will 
-    // { nodes:  [ { kind: 'crossing' }, { kind: 'street' }, ... ] }
+    // result will be { nodes:  [ { kind: 'crossing' }, { kind: 'street' }, ... ] }
   }
 })
 ```
@@ -111,41 +110,6 @@ If there are multiple paths that match a given Xml element, the handler of the f
 ## Create your own handler
 
 You can create your own handler, if you understand some of the inner workings of the XmlDigester. For now I would advise you not to do that, because the API might change. But the doucmentation will come as soon as possible, once I feel the API has stabilized enough.
-
-### Logging/Debugging
-
-This module contains a very simple debugging mechanism that allows you to inspect the inner workings.
-
-    var _logger = xml_digester._logger;
-    _logger.level(_logger.TRACE_LEVEL);
-
-The following logging level are supported 
-
-> **\_logger.ERROR\_LEVEL**  
-> **\_logger.WARN\_LEVEL**  
-> **\_logger.INFO\_LEVEL**  
-> **\_logger.DEBUG\_LEVEL**  
-> **\_logger.TRACE\_LEVEL**
-
-If you look at logging in `examples/basic-example.js` you should see something like
-
-![][trace]
-
-[trace]: https://raw.github.com/vrvolle/xml-digester/master/doc/trace.png 
-
-You can see
-
-  - all the opening tags (with their parent tags), e.g `<root><foo>`
-  - each current element as returned by sax-js: `{ name: 'root', attributes: {}, isSelfClosing: false }`
-  - all the closing tags (with their parent tags), e.g `<root><`**/**`foo>`
-  - and the current object stack:
-
-        DEBUG:  -> document
-        DEBUG:  ->   root
-
-    the object stack always contains a top level element 'document' and will normally directly correspond to the Xml element hierarchy, but if you manipulate the object stack (as the OrderedElementsHandler does)
-
-This logging should really help you, when you try to develop your own handler.
 
 ### The handler API
 
@@ -167,7 +131,7 @@ The DefaultHandler
 1. If the current node had no children and no attributes but some text content, then the text will be used as current node
 1. assigns the current object to a property (using the "node_name" as property name)
         
-    - if there already is a property with that name, an array will be created that contains the previous and the new object (every following object with the same will simply be added to the array)
+  - if there already is a property with that name, an array will be created that contains the previous and the new object (every following object with the same will simply be added to the array)
 
 1. reinstates the parent object as the current object
 
@@ -214,6 +178,40 @@ The above handler gets rid of the "bar" property and directly assign the 'bar'  
 
     { root: { bar1: 'some_text', bar2: 'some_other_text' } }
 
+### Logging/Debugging
+
+This module contains a very simple debugging mechanism that allows you to inspect the inner workings.
+
+    var _logger = xml_digester._logger;
+    _logger.level(_logger.TRACE_LEVEL);
+
+The following logging level are supported 
+
+> **\_logger.ERROR\_LEVEL**  
+> **\_logger.WARN\_LEVEL**  
+> **\_logger.INFO\_LEVEL**  
+> **\_logger.DEBUG\_LEVEL**  
+> **\_logger.TRACE\_LEVEL**
+
+If you look at logging in `examples/basic-example.js` you should see something like
+
+![][trace]
+
+[trace]: https://raw.github.com/vrvolle/xml-digester/master/doc/trace.png 
+
+You can see
+
+  - all the opening tags (with their parent tags), e.g `<root><foo>`
+  - each current element as returned by sax-js: `{ name: 'root', attributes: {}, isSelfClosing: false }`
+  - all the closing tags (with their parent tags), e.g `<root><`**/**`foo>`
+  - and the current object stack:
+
+        DEBUG:  -> document
+        DEBUG:  ->   root
+
+    the object stack always contains a top level element 'document' and will normally directly correspond to the Xml element hierarchy, but if you manipulate the object stack (as the OrderedElementsHandler does)
+
+This logging should really help you, when you try to develop your own handler.
 
 
 ## TODOs
