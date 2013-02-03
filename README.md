@@ -22,7 +22,7 @@ I needed to preserve the order of the 'nodes' ("crossing", "street", etc.):
     { nodes: [ {name:"crossing"}, {name:"street"}, ... ] }
 
 
-But none of the converters I tried (see below [alternatives](#alternatives)), allowed me to do that. Some like [xml-stream][xmlstream] allow to collect nodes of the same name into an array:
+But none of the converters I tried (see below [alternatives](#alternatives)), allowed me to do that. If the nodes were of the same name they would automatically be collected into an array:
 
     <nodes>
        <node kind="crossing"/>
@@ -31,6 +31,10 @@ But none of the converters I tried (see below [alternatives](#alternatives)), al
        <node kind="street"/>
        <node kind="end-of-town"/>
     </nodes>
+
+which would result in
+
+    { nodes: { node: [ { kind: 'crossing' }, { kind: 'street' }, ... ] } }
 
 but I didn't want to create a stylesheet that first transformed these documents. 
 
@@ -109,7 +113,7 @@ If there are multiple paths that match a given Xml element, the handler of the f
 
 ## Create your own handler
 
-You can create your own handler, if you understand some of the inner workings of the XmlDigester. For now I would advise you not to do that, because the API might change. But the doucmentation will come as soon as possible, once I feel the API has stabilized enough.
+You can create your own handler, if you understand some of the inner workings of the XmlDigester. For now I would advise you not to do that, because the API might change. 
 
 ### The handler API
 
@@ -128,10 +132,10 @@ The DefaultHandler
 The DefaultHandler
 
 1. gets the parent object from the object stack (`digester.object_stack`)
-1. If the current node had no children and no attributes but some text content, then the text will be used as current node
+1. If the current node has no children and no attributes but some text content, then the text will be used as current object
 1. assigns the current object to a property (using the "node_name" as property name)
         
-  - if there already is a property with that name, an array will be created that contains the previous and the new object (every following object with the same will simply be added to the array)
+  - if there already is a property with that name, an array will be created that contains the previous and the new object (every following object with the same name will simply be added to the array)
 
 1. reinstates the parent object as the current object
 
@@ -209,7 +213,7 @@ You can see
         DEBUG:  -> document
         DEBUG:  ->   root
 
-    the object stack always contains a top level element 'document' and will normally directly correspond to the Xml element hierarchy, but if you manipulate the object stack (as the OrderedElementsHandler does)
+    the object stack always contains a top level element 'document' and will normally directly correspond to the Xml element hierarchy, but if you manipulate the object stack (as the OrderedElementsHandler does) the stack might look completely different.
 
 This logging should really help you, when you try to develop your own handler.
 

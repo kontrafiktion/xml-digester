@@ -1,6 +1,6 @@
 {
   "name": "xml-digester",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "convert XML to JSON",
   "tags": [
     "xml",
@@ -22,7 +22,5 @@
   "license": {
     "type": "MIT"
   },
-  "readmeFilename": "README.md",
-  "_id": "xml-digester@0.0.1",
-  "_from": "xml-digester@>= 0.0.1"
+  "readmeFilename": "README.md"
 }

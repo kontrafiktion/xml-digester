@@ -100,13 +100,11 @@ function test_handler(test, xml, path, handler, expected) {
   var digester = new xml_digester.XmlDigester(options);
   digester.digest(xml, function(err, result) {
     if ( ! expected ) {
-      console.log("HERE");
       test.ok(err, "error expected");
     } else {
       test.ifError(err);
       test.deepEqual(result, expected, "xml: " + xml);
     }
-    // console.log(util.inspect(result, true, 3));
   });
 
 }
