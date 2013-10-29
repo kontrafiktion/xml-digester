@@ -1,6 +1,6 @@
 {
   "name": "xml-digester",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "convert XML to JSON",
   "tags": [
     "xml",
@@ -13,7 +13,7 @@
   },
   "main": "lib/xml-digester.js",
   "scripts": {
-    "test": "nodeunit test/"
+    "test": "nodeunit test/*"
   },
     "repository": {
     "type": "git",
