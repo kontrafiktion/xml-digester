@@ -12,11 +12,12 @@
     "sax": ">= 0.5.1"
   },
   "devDependencies": {
-    "nodeunit": ">=0.8.1"
+    "nodeunit": ">=0.8.1",
+    "jshint": "2.0.1"
   },
   "main": "lib/xml-digester.js",
   "scripts": {
-    "test": "nodeunit test/"
+    "test": "node_modules/.bin/jshint lib && node_modules/.bin/jshint test && nodeunit test/"
   },
     "repository": {
     "type": "git",
