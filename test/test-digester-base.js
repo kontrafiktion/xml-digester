@@ -11,7 +11,7 @@ function test_parse(test, xml, expected) {
   digester.digest(xml, function(err, result) {
     test.ifError(err);
     test.deepEqual(result, expected, "xml: " + xml);
-  })
+  });
 }
 
 exports.testSimple = function(test) {
@@ -54,12 +54,12 @@ exports.testSimple = function(test) {
 
 
    test.done();
-}
+};
 
 function test_error(test, xml) {
   digester.digest(xml, function (err, result) {
-    test.ok(err == undefined, "error expected: Xml is not correct: \"" + xml + "\"");
-  })
+    test.ok(err === undefined, "error expected: Xml is not correct: \"" + xml + "\"");
+  });
 }
 
 // exports.testInvalidXml = function(test) {
