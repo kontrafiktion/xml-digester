@@ -11,6 +11,9 @@
   "dependencies": {
     "sax": ">= 0.5.1"
   },
+  "devDependencies": {
+    "nodeunit": ">=0.8.1"
+  },
   "main": "lib/xml-digester.js",
   "scripts": {
     "test": "nodeunit test/"
